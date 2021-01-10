@@ -19,7 +19,7 @@ class UI {
   <td> ${book.title} </td>
   <td> ${book.author} </td
   <td> ${book.isbn} </td>
-  <td> <a href = "#" class = "delete">X</a></td>`
+  <td> <a href="#" class="delete">X</a></td>`
 
   //append row to the element
   list.appendChild(row);
@@ -62,6 +62,59 @@ class UI {
   }
 }
 
+//Persist Book to Local Storage
+class Store {
+  static getBooks(){
+    let books;
+    if (localStorage.getItem('books') === null){
+      books = [];
+    }else {
+      books = JSON.parse(localStorage.getItem('books'))
+    }
+
+    return books
+  }
+
+  static displayBooks(){
+    const books = Store.getBooks();
+
+    books.forEach(function(book){
+      //Instantiate UI
+      const ui = new UI;
+
+       //Add items to the UI;
+      ui.addBookToList(book);
+
+    })
+
+  }
+
+  static addBook(book){
+    const books = Store.getBooks();
+
+    books.push(book);
+
+    localStorage.setItem('books', JSON.stringify(books))
+  }
+
+  static removeBook(isbn){
+    const books = Store.getBooks();
+
+    books.forEach(function(book, index){
+      if (book.isbn === isbn){
+        books.slice(index, 1);
+      }
+    });
+
+    localStorage.setItem('books', JSON.stringify(books));
+
+  }
+}
+
+
+//Load events to the UI listener
+document.addEventListener('DOMContentLoaded', Store.displayBooks);
+
 document.getElementById('book-form').addEventListener('submit', function(e){
   //Input varriables
   const title = document.getElementById('title').value,
@@ -81,6 +134,9 @@ document.getElementById('book-form').addEventListener('submit', function(e){
     //Add items to the UI;
   ui.addBookToList(book);
 
+  //persist book to local storage
+  Store.addBook(book);
+
   //show success alert
   ui.showAlert('Book added to the list succesfully', 'success')
 
@@ -96,13 +152,17 @@ document.getElementById('book-form').addEventListener('submit', function(e){
 document.getElementById('list-body').addEventListener('click', function(e){
   
   //Instantiate the UI
-  const ui = new UI();
+  const ui = new UI;
 
   //deleteBook
   ui.deleteBook(e.target);
 
+  //deleteBook from local storage
+ Store.removeBook(e.target.parentElement.previousElementSibling.
+    textContent);
+
   //showAlert
   ui.showAlert('Book Deleted', 'success');
 
-  e.preventDefault()
+  e.preventDefault() 
 })
