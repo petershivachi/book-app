@@ -34,6 +34,32 @@ UI.prototype.clearFields = function(){
   document.getElementById('isbn').value = '';
 }
 
+//showAlerts
+UI.prototype.showAlert = function(message, className){
+  //create a div
+  const div = document.createElement('div');
+
+  //add a className
+  div.className = `alert ${className}`;
+
+  //create a textnode
+  div.appendChild(document.createTextNode(message));
+
+  //Get parent element
+  const container = document.querySelector('.container');
+
+  const form = document.querySelector('#book-form');
+
+  //insert div
+  container.insertBefore(div, form)
+
+  //setTimeout
+  setTimeout(function () {
+    document.querySelector('.alert').remove()
+  }, 3000)
+ 
+}
+
 //Add an event listener to the function
 document.getElementById('book-form').addEventListener('submit', function(e){
   //Input varriables
@@ -47,11 +73,19 @@ document.getElementById('book-form').addEventListener('submit', function(e){
   //Instantiate the UI
   const ui = new UI();
 
-  //Add items to the UI;
+  if ( title === '' || author === '' || isbn === ''){
+    //show an error alert
+    ui.showAlert('Please make sure to fill in all fields', 'danger')
+  }else {
+    //Add items to the UI;
   ui.addBookToList(book);
 
+  //show success alert
+  ui.showAlert('Book added to the list succesfully', 'success')
+
   //clear the input
-  ui.clearFields(book)
+  ui.clearFields(book);
+  }
 
   e.preventDefault();
 
